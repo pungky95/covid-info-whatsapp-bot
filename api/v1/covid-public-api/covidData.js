@@ -2,6 +2,7 @@ const keys = require('../../../config/keys');
 const axios = require('axios').default;
 const { APIURLCOVID } = keys;
 const models = require('../../../models');
+const thousandSeparator = require('../../../helper/thousandSeparator');
 
 const getConfirmedCaseByCountryToday = async (req, res) => {
   const code = req.body.Field_code_Value;
@@ -28,7 +29,7 @@ const getConfirmedCaseByCountryToday = async (req, res) => {
   let Confirmed = 0;
   if (results.length > 0) {
     const latestData = results.pop();
-    Confirmed = latestData.Confirmed;
+    Confirmed = thousandSeparator(latestData.Confirmed);
   }
   return res
     .status(200)
@@ -59,7 +60,7 @@ const getDeathCaseByCountryToday = async (req, res) => {
   let Deaths = 0;
   if (results.length > 0) {
     const latestData = results.pop();
-    Deaths = latestData.Deaths;
+    Deaths = thousandSeparator(latestData.Deaths);
   }
   return res
     .status(200)
@@ -70,7 +71,8 @@ const getConfirmedCaseWorldGlobal = async (req, res) => {
   await axios
     .get(url)
     .then(response => {
-      const { TotalConfirmed } = response.data;
+      const latestData = response.data;
+      const TotalConfirmed = thousandSeparator(latestData.TotalConfirmed);
       return res
         .status(200)
         .send({ actions: [{ say: `Total Active Cases ${TotalConfirmed}` }] });
@@ -87,7 +89,8 @@ const getDeathCaseWorldGlobal = async (req, res) => {
   await axios
     .get(url)
     .then(response => {
-      const { TotalDeaths } = response.data;
+      const latestData = response.data;
+      const TotalDeaths = thousandSeparator(latestData.TotalDeaths);
       return res
         .status(200)
         .send({ actions: [{ say: `Total Deaths ${TotalDeaths}` }] });
